@@ -12,7 +12,7 @@ uint8_t green = 0;
 uint8_t brightness = 0;
 bool led_on = false;
 
-WiFiServer server(4000);
+WiFiServer server(8080);
 
 void setup() {
   // set LED pins to outputs
@@ -29,12 +29,12 @@ void setup() {
 
   // ask user for ssid and password of wifi network and connect to that network
   // TODO: use soft AP mode to allow network info to be passed during setup
-  Serial.setTimeout(100000);
-  Serial.println("Enter network SSID: ");
-  String ssid = Serial.readStringUntil('\n');
-  Serial.println("Enter network password: ");
-  String password = Serial.readStringUntil('\n');
-  WiFi.begin(ssid.c_str(), password.c_str());
+//  Serial.setTimeout(100000);
+//  Serial.println("Enter network SSID: ");
+//  String ssid = Serial.readStringUntil('\n');
+//  Serial.println("Enter network password: ");
+//  String password = Serial.readStringUntil('\n');
+//  WiFi.begin(ssid.c_str(), password.c_str());
 
   // print periods and blink green until connected to the wifi network
   Serial.print("Connecting");

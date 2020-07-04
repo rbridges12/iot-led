@@ -58,21 +58,38 @@ void setup() {
 
 
 void loop() {
+  if (server.client()) Serial.println("client connected"); // debugging
   server.handleClient(); //Handle incoming client requests
 }
 
 
 void handle_index() {
+  Serial.println("index requested"); // debugging
   server.send(200, "text/plain", "LED Web Server");
 }
 
 
 // handler for POST request to change the RGB color of the LED
 void handle_update_rgb() {
-  StaticJsonDocument<> doc = verify_json();
+  Serial.println("udpate_rgb requested"); // debugging
+  // check for POST request body
+  if (!server.hasArg("plain")) {
+    Serial.println("Error: POST body not found");
+    server.send(400, "text/plain", "body not found");
+    return;
+  }
 
-  // return if verify_json was unsuccessful
-  if (!doc) return;
+  // deserialize JSON from POST body
+  StaticJsonDocument<json_capacity> doc;
+  DeserializationError err = deserializeJson(doc, server.arg("plain"));
+
+  // ensure deserialization was successful
+  if (err) {
+    Serial.print(F("deserializeJson() failed with code "));
+    Serial.println(err.c_str());
+    server.send(400, "text/plain", "invalid request");
+    return;
+  }
 
   // get JSON object
   JsonObject obj = doc.as<JsonObject>();
@@ -89,7 +106,7 @@ void handle_update_rgb() {
   // get RGB values and update LED
   red = doc["r"];
   green = doc["g"];
-  blue = doc"b"];
+  blue = doc["b"];
   
   update_led();
 }
@@ -97,11 +114,25 @@ void handle_update_rgb() {
 
 // handler for POST request to change the LED brightness value
 void handle_update_brightness() {
-  StaticJsonDocument<> doc = verify_json();
+  // check for POST request body
+  if (!server.hasArg("plain")) {
+    Serial.println("Error: POST body not found");
+    server.send(400, "text/plain", "body not found");
+    return;
+  }
 
-  // return if verify_json was unsuccessful
-  if (!doc) return;
+  // deserialize JSON from POST body
+  StaticJsonDocument<json_capacity> doc;
+  DeserializationError err = deserializeJson(doc, server.arg("plain"));
 
+  // ensure deserialization was successful
+  if (err) {
+    Serial.print(F("deserializeJson() failed with code "));
+    Serial.println(err.c_str());
+    server.send(400, "text/plain", "invalid request");
+    return;
+  }
+  
   // get JSON object
   JsonObject obj = doc.as<JsonObject>();
 
@@ -121,10 +152,24 @@ void handle_update_brightness() {
 
 // handler for POST request to toggle the LED on or off
 void handle_toggle_led() {
-  StaticJsonDocument<> doc = verify_json();
+  // check for POST request body
+  if (!server.hasArg("plain")) {
+    Serial.println("Error: POST body not found");
+    server.send(400, "text/plain", "body not found");
+    return;
+  }
 
-  // return if verify_json was unsuccessful
-  if (!doc) return;
+  // deserialize JSON from POST body
+  StaticJsonDocument<json_capacity> doc;
+  DeserializationError err = deserializeJson(doc, server.arg("plain"));
+
+  // ensure deserialization was successful
+  if (err) {
+    Serial.print(F("deserializeJson() failed with code "));
+    Serial.println(err.c_str());
+    server.send(400, "text/plain", "invalid request");
+    return;
+  }
 
   // get JSON object
   JsonObject obj = doc.as<JsonObject>();
@@ -140,32 +185,6 @@ void handle_toggle_led() {
   led_on = doc["toggle"];
   
   update_led();
-}
-
-
-// verify POST request and the JSON contained in it
-// returns the JSON document or null if there were any errors
-StaticJsonDocument<json_capacity> verify_json() {
-  // check for POST request body
-  if (!server.hasArg("plain")) {
-    Serial.println("Error: POST body not found");
-    server.send(400, "text/plain", "body not found");
-    return null;
-  }
-
-  // deserialize JSON from POST body
-  StaticJsonDocument<json_capacity> doc;
-  DeserializationError err = deserializeJson(doc, server.arg("plain"));
-
-  // ensure deserialization was successful
-  if (err) {
-    Serial.print(F("deserializeJson() failed with code "));
-    Serial.println(err.c_str());
-    server.send(400, "text/plain", "invalid request");
-    return null;
-  }
-
-  return doc;
 }
 
 

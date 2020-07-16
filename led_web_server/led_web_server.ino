@@ -17,7 +17,7 @@ bool led_on = false;
 
 ESP8266WebServer server(8080);
 
-const int json_capacity = 100; // Json document capacity
+const int json_capacity = 1000; // Json document capacity
 const char* ssid = ""; // Wi-Fi SSID
 const char* password =  ""; // Wi-Fi Password
 
@@ -122,6 +122,7 @@ void handle_update_brightness() {
   }
 
   // deserialize JSON from POST body
+  String message = server.arg("plain");
   StaticJsonDocument<json_capacity> doc;
   DeserializationError err = deserializeJson(doc, server.arg("plain"));
 

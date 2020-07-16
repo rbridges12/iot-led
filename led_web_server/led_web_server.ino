@@ -58,7 +58,6 @@ void setup() {
 
 
 void loop() {
-  if (server.client()) Serial.println("client connected"); // debugging
   server.handleClient(); //Handle incoming client requests
 }
 
@@ -122,7 +121,6 @@ void handle_update_brightness() {
   }
 
   // deserialize JSON from POST body
-  String message = server.arg("plain");
   StaticJsonDocument<json_capacity> doc;
   DeserializationError err = deserializeJson(doc, server.arg("plain"));
 
@@ -191,6 +189,19 @@ void handle_toggle_led() {
 
 // update the LED color, brightness, and toggle
 void update_led() {
+
+  // debugging
+  Serial.print("red = ");
+  Serial.println(red);
+  Serial.print("green = ");
+  Serial.println(green);
+  Serial.print("blue = ");
+  Serial.println(blue);
+  Serial.print("brightness = ");
+  Serial.println(brightness);
+  Serial.print("led_on = ");
+  Serial.println(led_on);
+  
   if (led_on) {
     float brightness_factor = brightness / 255.0;
     analogWrite(RED_PIN, red * brightness_factor);

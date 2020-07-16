@@ -181,7 +181,8 @@ void handle_toggle_led() {
   }
   
   // get toggle value
-  led_on = doc["toggle"];
+  int toggle = doc["toggle"];
+  led_on = toggle;
   
   update_led();
 }

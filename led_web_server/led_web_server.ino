@@ -35,7 +35,7 @@ void setup() {
   Serial.begin(115200);
   WiFi.begin(ssid, password); 
 
- // wait for connection
+  // wait for connection
   Serial.print("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
       delay(400);
@@ -47,6 +47,8 @@ void setup() {
   Serial.println();
   Serial.print("Connected, local IP address: ");
   Serial.println(WiFi.localIP());
+
+  send_ip();
 
   // assign handlers
   server.on("/", handle_index);

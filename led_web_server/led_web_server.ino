@@ -230,7 +230,7 @@ void blink_status() {
 }
 
 // send a request to the server so it can obtain the esp8266's IP address
-void send_ip() {
+void send_empty_post() {
   HTTPClient client;
 
   // connect to the server and ensure connection was successful
@@ -246,4 +246,32 @@ void send_ip() {
   // send POST request and print the resulting HTTP code
   Serial.println(client.POST("filler"));
   client.end();
+}
+
+void send_ip() {
+  HTTPClient client;
+
+  client.begin("http://api.ipify.org", 80);
+//  if (!client.connected()) {
+//    Serial.println("failed to obtain IP from ipify API");
+//    return;
+//  }
+  Serial.print("HTTP code from ipify: ");
+  //Serial.println(client.GET());
+  client.GET();
+  String public_ip = client.getString();
+  Serial.println(public_ip);
+
+//  WiFiClient client;
+//  if (client.connect("api.ipify.org", 80)) {
+//    Serial.println("connected to ipify");
+//    client.println("GET / HTTP/1.0");
+//    client.println("Host: api.ipify.org");
+//    client.println();
+//
+//    while (client.available()) {
+//      Serial.println(client.read());
+//    }
+//  }
+  
 }

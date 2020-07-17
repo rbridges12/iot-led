@@ -260,20 +260,36 @@ void send_ip() {
   while (!client.available()) {
     if (millis() > timeout) {
       Serial.println("ipify timed out");
+      client.stop();
       return;
     }
   }
 
   String raw_msg = client.readString();
-  Serial.println(raw_msg);
+  client.stop();
   int i = raw_msg.length() - 1;
-  Serial.println(raw_msg.charAt(i));
   while (raw_msg.charAt(i) != '\n') {
-    Serial.println(raw_msg.charAt(i));
     i--;
   }
   String ip_string = raw_msg.substring(i);
   Serial.println(ip_string);
   
+  if (!client.connect(server_domain_name, port)) {
+    Serial.print("failed to connect to ");
+    Serial.println(server_domain_name);
+    return;
+  }
+  Serial.println("connected to heroku");
   
+  client.print("GET /api/led_control/client_ip/");
+  client.print(ip_string);
+  client.print(" HTTP/1.1\r\nHost: ");
+  client.print(server_domain_name);
+  client.print("\r\n\r\n");
+
+  Serial.print("GET /api/led_control/client_ip/");
+  Serial.print(ip_string);
+  Serial.print(" HTTP/1.1\r\nHost: ");
+  Serial.print(server_domain_name);
+  Serial.print("\r\n\r\n");
 }

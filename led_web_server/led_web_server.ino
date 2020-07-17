@@ -234,7 +234,7 @@ void send_ip() {
   HTTPClient client;
 
   // connect to the server and ensure connection was successful
-  client.begin(server_domain_name, port, "/client_ip");
+  client.begin(server_domain_name, port, "/api/client_ip");
   if (!client.connected()) {
     Serial.print("could not connect to ");
     Serial.println(server_domain_name);
@@ -246,10 +246,4 @@ void send_ip() {
   // send POST request and print the resulting HTTP code
   Serial.println(client.POST("filler"));
   client.end();
-}
-
-
-void send_ip_manual() {
-  WiFiClient client;
-  
 }

@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266HTTPClient.h>
 #include <ArduinoJson.h>
 
 // LED pins
@@ -15,11 +16,13 @@ uint8_t green = 0;
 uint8_t brightness = 0;
 bool led_on = false;
 
-ESP8266WebServer server(8080);
-
+char server_domain_name[] = "http://iot-testing.herokuapp.com";
+const int port = 8080;
 const int json_capacity = 1000; // Json document capacity
 const char* ssid = ""; // Wi-Fi SSID
 const char* password =  ""; // Wi-Fi Password
+
+ESP8266WebServer server(port);
 
 
 void setup() {
@@ -222,4 +225,23 @@ void blink_status() {
   digitalWrite(STATUS_PIN, HIGH);
   delay(100);
   digitalWrite(STATUS_PIN, LOW);
+}
+
+// send a request to the server so it can obtain the esp8266's IP address
+void send_ip() {
+  HTTPClient client;
+
+  // connect to the server and ensure connection was successful
+  client.begin(server_domain_name, port, "/client_ip");
+  if (!client.connected()) {
+    Serial.print("could not connect to ");
+    Serial.println(server_domain_name);
+    return;
+  }
+  Serial.print("connected to ");
+  Serial.println(server_domain_name);
+
+  // send POST request and print the resulting HTTP code
+  Serial.println(client.POST(""));
+  client.end();
 }

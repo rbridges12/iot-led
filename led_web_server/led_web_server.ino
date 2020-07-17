@@ -249,29 +249,31 @@ void send_empty_post() {
 }
 
 void send_ip() {
-  HTTPClient client;
+  WiFiClient client;
+  if (!client.connect("api.ipify.org", 80)) {
+    Serial.println("failed to connect to ipify");
+    return;
+  }
+  
+  client.print("GET / HTTP/1.1\r\nHost: api.ipify.org\r\n\r\n");
+  unsigned long timeout = millis() + 5000;
+  while (!client.available()) {
+    if (millis() > timeout) {
+      Serial.println("ipify timed out");
+      return;
+    }
+  }
 
-  client.begin("http://api.ipify.org", 80);
-//  if (!client.connected()) {
-//    Serial.println("failed to obtain IP from ipify API");
-//    return;
-//  }
-  Serial.print("HTTP code from ipify: ");
-  //Serial.println(client.GET());
-  client.GET();
-  String public_ip = client.getString();
-  Serial.println(public_ip);
-
-//  WiFiClient client;
-//  if (client.connect("api.ipify.org", 80)) {
-//    Serial.println("connected to ipify");
-//    client.println("GET / HTTP/1.0");
-//    client.println("Host: api.ipify.org");
-//    client.println();
-//
-//    while (client.available()) {
-//      Serial.println(client.read());
-//    }
-//  }
+  String raw_msg = client.readString();
+  Serial.println(raw_msg);
+  int i = raw_msg.length() - 1;
+  Serial.println(raw_msg.charAt(i));
+  while (raw_msg.charAt(i) != '\n') {
+    Serial.println(raw_msg.charAt(i));
+    i--;
+  }
+  String ip_string = raw_msg.substring(i);
+  Serial.println(ip_string);
+  
   
 }

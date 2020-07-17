@@ -274,14 +274,16 @@ void send_ip() {
   String ip_string = raw_msg.substring(i);
   Serial.println(ip_string);
   
-  if (!client.connect(server_domain_name, port)) {
+//  if (!client.connect(server_domain_name, 80)) {
+  if (!client.connect("http://iot-testing.herokuapp.com/api/led_control/client_ip", 80)) {
     Serial.print("failed to connect to ");
     Serial.println(server_domain_name);
     return;
   }
   Serial.println("connected to heroku");
   
-  client.print("GET /api/led_control/client_ip/");
+//  client.print("GET /api/led_control/client_ip/");
+  client.print("GET /");
   client.print(ip_string);
   client.print(" HTTP/1.1\r\nHost: ");
   client.print(server_domain_name);

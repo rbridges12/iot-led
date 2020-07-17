@@ -244,6 +244,12 @@ void send_ip() {
   Serial.println(server_domain_name);
 
   // send POST request and print the resulting HTTP code
-  Serial.println(client.POST(""));
+  Serial.println(client.POST("filler"));
   client.end();
+}
+
+
+void send_ip_manual() {
+  WiFiClient client;
+  
 }

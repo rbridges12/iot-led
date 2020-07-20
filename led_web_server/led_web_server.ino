@@ -218,22 +218,29 @@ else{
 
 StaticJsonDocument<1000> message;
 
-message["toggle": toggleStatus];
+message["toggle"] = toggleStatus;
 
-message["colors": [red, green, blue]];
+message["red"] = red;
 
-message["brightness": brightness];
+message["green"] = green;
+
+message["blue"] = blue;
+
+message["brightness"] = brightness;
+
+ 
+
+String serializedOutput = "";
+
+serializeJson(message, serializedOutput);
 
 //String message = "toggle: " + (String)(led_on) + " colors: " + (String)(red) + ", " + (String)(green) + ", " (String)(blue) + " brightness: " + String(getBrightness());
 
 //String message = "toggle: " + (String)toggleStatus + " colors: " + (String)red + ", " + (String)green + ", " + (String)blue + " brightness: " + (String)brightness;
 
-Serial.println(message);
+Serial.println(serializedOutput);
 
-server.send(200, Json, message);          //Returns the HTTP response
-
- 
-
+server.send(200, "text/plain", serializedOutput);          //Returns the HTTP response
 }
 
 

@@ -113,6 +113,8 @@ void handle_update_rgb() {
   blue = doc["b"];
   
   update_led();
+
+  server.send(200, "Color has been updated successfully");
 }
 
 
@@ -151,6 +153,8 @@ void handle_update_brightness() {
   brightness = doc["brightness"];
   
   update_led();
+  
+  server.send(200, "Brightness has been updated successfully");
 }
 
 
@@ -190,6 +194,8 @@ void handle_toggle_led() {
   led_on = toggle;
   
   update_led();
+
+  server.send(200, "Toggle has been updated successfully");
 }
 
 

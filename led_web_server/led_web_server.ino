@@ -200,47 +200,28 @@ void handle_toggle_led() {
 }
 
 
+// handler for GET request for current LED settings
 void handle_sync_data(){
 
-int toggleStatus = 0;
+  // convert led_on from bool to int as 1 or 0
+  int toggleStatus = 0;
+  if (led_on) {
+    toggleStatus = 1;
+  }
 
-if (led_on == false){
+  // put LED setting values into a JSON document object
+  StaticJsonDocument<json_capacity> settings;
+  settings["toggle"] = toggleStatus;
+  settings["red"] = red;
+  settings["green"] = green;
+  settings["blue"] = blue; 
+  settings["brightness"] = brightness;
 
-  toggleStatus = 0; 
-
-}
-
-else{
-
-  toggleStatus = 1;
-
-}
-
-StaticJsonDocument<1000> message;
-
-message["toggle"] = toggleStatus;
-
-message["red"] = red;
-
-message["green"] = green;
-
-message["blue"] = blue;
-
-message["brightness"] = brightness;
-
- 
-
-String serializedOutput = "";
-
-serializeJson(message, serializedOutput);
-
-//String message = "toggle: " + (String)(led_on) + " colors: " + (String)(red) + ", " + (String)(green) + ", " (String)(blue) + " brightness: " + String(getBrightness());
-
-//String message = "toggle: " + (String)toggleStatus + " colors: " + (String)red + ", " + (String)green + ", " + (String)blue + " brightness: " + (String)brightness;
-
-Serial.println(serializedOutput);
-
-server.send(200, "text/plain", serializedOutput);          //Returns the HTTP response
+  // serialize JSON document object into a JSON string
+  String settings_string = "";
+  serializeJson(settings, settings_string);
+  
+  server.send(200, "text/plain", settings_string);
 }
 
 

@@ -55,6 +55,7 @@ void setup() {
   server.on("/update_rgb", handle_update_rgb);
   server.on("/update_brightness", handle_update_brightness);
   server.on("/toggle_led", handle_toggle_led);
+  server.on("/sync_data", handle_sync_data);
 
   // start server
   server.begin();
@@ -196,6 +197,43 @@ void handle_toggle_led() {
   update_led();
 
   server.send(200, "Toggle has been updated successfully");
+}
+
+
+void handle_sync_data(){
+
+int toggleStatus = 0;
+
+if (led_on == false){
+
+  toggleStatus = 0; 
+
+}
+
+else{
+
+  toggleStatus = 1;
+
+}
+
+StaticJsonDocument<1000> message;
+
+message["toggle": toggleStatus];
+
+message["colors": [red, green, blue]];
+
+message["brightness": brightness];
+
+//String message = "toggle: " + (String)(led_on) + " colors: " + (String)(red) + ", " + (String)(green) + ", " (String)(blue) + " brightness: " + String(getBrightness());
+
+//String message = "toggle: " + (String)toggleStatus + " colors: " + (String)red + ", " + (String)green + ", " + (String)blue + " brightness: " + (String)brightness;
+
+Serial.println(message);
+
+server.send(200, Json, message);          //Returns the HTTP response
+
+ 
+
 }
 
 

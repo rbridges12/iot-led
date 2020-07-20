@@ -13,7 +13,7 @@
 uint8_t red = 0;
 uint8_t blue = 0;
 uint8_t green = 0;
-uint8_t brightness = 0;
+uint8_t brightness = 255;
 bool led_on = false;
 
 char server_domain_name[] = "http://iot-testing.herokuapp.com";
@@ -249,49 +249,43 @@ void send_empty_post() {
 }
 
 void send_ip() {
-  WiFiClient client;
-  if (!client.connect("api.ipify.org", 80)) {
+  WiFiClient api_client;
+  if (!api_client.connect("api.ipify.org", 80)) {
     Serial.println("failed to connect to ipify");
     return;
   }
   
-  client.print("GET / HTTP/1.1\r\nHost: api.ipify.org\r\n\r\n");
+  api_client.print("GET / HTTP/1.1\r\nHost: api.ipify.org\r\n\r\n");
   unsigned long timeout = millis() + 5000;
-  while (!client.available()) {
+  while (!api_client.available()) {
     if (millis() > timeout) {
       Serial.println("ipify timed out");
-      client.stop();
+      api_client.stop();
       return;
     }
   }
 
-  String raw_msg = client.readString();
-  client.stop();
+  String raw_msg = api_client.readString();
+  api_client.stop();
   int i = raw_msg.length() - 1;
   while (raw_msg.charAt(i) != '\n') {
     i--;
   }
   String ip_string = raw_msg.substring(i);
   Serial.println(ip_string);
-  
-//  if (!client.connect(server_domain_name, 80)) {
-  if (!client.connect("http://iot-testing.herokuapp.com/api/led_control/client_ip", 80)) {
-    Serial.print("failed to connect to ");
-    Serial.println(server_domain_name);
+
+
+  HTTPClient client;
+  String url = server_domain_name + (String) "/api/led_control/client_ip/" + ip_string;
+  client.begin(url);
+  if (!client.connected()) {
+    Serial.print("could not connect to ");
+    Serial.println(url);
     return;
   }
-  Serial.println("connected to heroku");
   
-//  client.print("GET /api/led_control/client_ip/");
-  client.print("GET /");
-  client.print(ip_string);
-  client.print(" HTTP/1.1\r\nHost: ");
-  client.print(server_domain_name);
-  client.print("\r\n\r\n");
-
-  Serial.print("GET /api/led_control/client_ip/");
-  Serial.print(ip_string);
-  Serial.print(" HTTP/1.1\r\nHost: ");
-  Serial.print(server_domain_name);
-  Serial.print("\r\n\r\n");
+  int http_code = client.GET();
+  Serial.print("HTTP code from IP request: ");
+  Serial.println(http_code);
+  client.end();
 }

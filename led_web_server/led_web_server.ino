@@ -266,10 +266,14 @@ void send_ip() {
   // connect client to the control server with public IP in the address
   String url = server_domain_name + (String) "/api/led_control/client_ip/" + ip_string;
   client.begin(url);
-
-  // send GET request
+  
+  // send GET request and test connection
   int http_code = client.GET();
+  if (!client.connected()) {
+    Serial.print("could not connect to ");
+    Serial.println(url);
+  }
   client.end();
-  Serial.print("HTTP code from IP request: ");
+  Serial.print("HTTP code from IP send request: ");
   Serial.println(http_code);
 }

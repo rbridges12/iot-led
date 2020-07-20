@@ -229,32 +229,18 @@ void blink_status() {
   digitalWrite(STATUS_PIN, LOW);
 }
 
-// send a request to the server so it can obtain the esp8266's IP address
-void send_empty_post() {
-  HTTPClient client;
 
-  // connect to the server and ensure connection was successful
-  client.begin(server_domain_name, port, "/api/client_ip");
-  if (!client.connected()) {
-    Serial.print("could not connect to ");
-    Serial.println(server_domain_name);
-    return;
-  }
-  Serial.print("connected to ");
-  Serial.println(server_domain_name);
-
-  // send POST request and print the resulting HTTP code
-  Serial.println(client.POST("filler"));
-  client.end();
-}
-
+// send public IP address of NodeMCU to the control server
 void send_ip() {
   WiFiClient api_client;
+
+  // connect to ipify API
   if (!api_client.connect("api.ipify.org", 80)) {
     Serial.println("failed to connect to ipify");
     return;
   }
-  
+
+  // request plain text IP from API, timeout after 5 seconds
   api_client.print("GET / HTTP/1.1\r\nHost: api.ipify.org\r\n\r\n");
   unsigned long timeout = millis() + 5000;
   while (!api_client.available()) {
@@ -265,27 +251,25 @@ void send_ip() {
     }
   }
 
+  // read the API response and parse the IP address string
   String raw_msg = api_client.readString();
   api_client.stop();
   int i = raw_msg.length() - 1;
   while (raw_msg.charAt(i) != '\n') {
     i--;
   }
-  String ip_string = raw_msg.substring(i);
+  String ip_string = raw_msg.substring(i+1);
   Serial.println(ip_string);
-
-
+  
   HTTPClient client;
+
+  // connect client to the control server with public IP in the address
   String url = server_domain_name + (String) "/api/led_control/client_ip/" + ip_string;
   client.begin(url);
-  if (!client.connected()) {
-    Serial.print("could not connect to ");
-    Serial.println(url);
-    return;
-  }
-  
+
+  // send GET request
   int http_code = client.GET();
+  client.end();
   Serial.print("HTTP code from IP request: ");
   Serial.println(http_code);
-  client.end();
 }
